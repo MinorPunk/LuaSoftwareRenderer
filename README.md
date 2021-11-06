@@ -14,6 +14,6 @@ $sudo apt install love
 and run
 
 ```bash	
-$love LuaSR
+$love LuaSoftwareRenderer
 ```
 

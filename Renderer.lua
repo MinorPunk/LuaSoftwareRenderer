@@ -27,6 +27,7 @@ end
 --渲染流程
 Renderer.Render = function(self, dt, imageData, renderable, color)
     --取三角形
+    lastTime = love.timer.getTime()
     for i = 1, #renderable.ebo, 3 do
         local v2fs = {}
         for j = i, i + 2 do
@@ -47,57 +48,63 @@ Renderer.Render = function(self, dt, imageData, renderable, color)
         --画三角形
         DrawTriangle(self, v2fs, imageData, color)
     end
+    print("Render Loop: ", love.timer.getTime() - lastTime)
+end
+
+function Rasterization(self, v2fs, imageData, color)
 end
 
 --[[
     光栅化
 ]]
 function DrawTriangle(self, v2fs, imageData, color)
-    bboxMin = Vector4(imageData:getWidth() - 1, imageData:getHeight() - 1)
+    width = imageData:getWidth() - 1
+    height = imageData:getHeight() - 1
+    bboxMin = Vector4(width, height)
     bboxMax = Vector4()
-    clamp = Vector4(imageData:getWidth() - 1, imageData:getHeight() - 1)
     for i = 1, 3 do
         bboxMin.x = math.max(0, math.min(bboxMin.x, v2fs[i].clipPos.x))
         bboxMin.y = math.max(0, math.min(bboxMin.y, v2fs[i].clipPos.y))
-        bboxMax.x = math.min(clamp.x, math.max(bboxMax.x, v2fs[i].clipPos.x))
-        bboxMax.y = math.min(clamp.y, math.max(bboxMax.y, v2fs[i].clipPos.y))
+        bboxMax.x = math.min(width, math.max(bboxMax.x, v2fs[i].clipPos.x))
+        bboxMax.y = math.min(height, math.max(bboxMax.y, v2fs[i].clipPos.y))
     end
 
-    --print(bboxMin, bboxMax)
+    a01 = v2fs[1].clipPos.y - v2fs[2].clipPos.y
+    b01 = v2fs[2].clipPos.x - v2fs[1].clipPos.x
+    a12 = v2fs[2].clipPos.y - v2fs[3].clipPos.y
+    b12 = v2fs[3].clipPos.x - v2fs[2].clipPos.x
+    a20 = v2fs[3].clipPos.y - v2fs[1].clipPos.y
+    b20 = v2fs[1].clipPos.x - v2fs[3].clipPos.x
 
     p = Vector4(bboxMin.x, bboxMin.y)
-    for x = bboxMin.x, bboxMax.x do
-        for y = bboxMin.y, bboxMax.y do
-            bcScreen = self.BarayCentric(v2fs, Vector4(x, y))
-            if bcScreen.x >= 0 and bcScreen.y >= 0 and bcScreen.z >= 0 then
-                --print("drawPixel", x, y)
+    w0_row = Orient2d(v2fs[2], v2fs[3], p)
+    w1_row = Orient2d(v2fs[3], v2fs[1], p)
+    w2_row = Orient2d(v2fs[1], v2fs[2], p)
+
+    --Rasterize
+    for y = bboxMin.y, bboxMax.y do
+        w0 = w0_row
+        w1 = w1_row
+        w2 = w2_row
+
+        for x = bboxMin.x, bboxMax.x do
+            if w0 >= 0 and w1 >= 0 and w2 >= 0 then
                 imageData:setPixel(x, y, color.x, color.y, color.z, color.w)
             end
+
+            w0 = w0 + a12
+            w1 = w1 + a20
+            w2 = w2 + a01
         end
+
+        w0_row = w0_row + b12
+        w1_row = w1_row + b20
+        w2_row = w2_row + b01
     end
 end
 
-Renderer.BarayCentric = function(v2fs, p)
-    cross =
-        Vector4.Cross(
-        Vector4(
-            v2fs[3].clipPos.x - v2fs[1].clipPos.x,
-            v2fs[2].clipPos.x - v2fs[1].clipPos.x,
-            v2fs[1].clipPos.x - p.x,
-            0
-        ),
-        Vector4(
-            v2fs[3].clipPos.y - v2fs[1].clipPos.y,
-            v2fs[2].clipPos.y - v2fs[1].clipPos.y,
-            v2fs[1].clipPos.y - p.y,
-            0
-        )
-    )
-
-    if (math.abs(cross.z) < 0) then
-        return Vector4(-1, 1, 1)
-    end
-    return Vector4(1 - (cross.x + cross.y) / cross.z, cross.y / cross.z, cross.x / cross.z)
+function Orient2d(a, b, p)
+    return (b.clipPos.x - a.clipPos.x) * (p.y - a.clipPos.y) - (b.clipPos.y - a.clipPos.y) * (p.x - a.clipPos.x)
 end
 
 --视口转换

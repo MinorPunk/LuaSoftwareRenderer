@@ -6,8 +6,8 @@ require("Renderable")
 require("Material")
 
 FPS = 0
-Resolution = {x = 640, y = 480}
-WindowSize = {x = 640, y = 480}
+Resolution = {x = 1600, y = 900}
+WindowSize = {x = 1600, y = 900}
 local myRenderer = Renderer(0, 0, Resolution.x, Resolution.y)
 local myCamera = Camera(WindowSize.x / WindowSize.y)
 local myShader = Shader(myCamera)
@@ -29,7 +29,6 @@ function love.load()
   myRenderer:Render(1, imageData, cat, Vector4(0.4, 0.7, 1, 1))
 end
 
-local points = {}
 function love.update(dt)
   FPS = love.timer.getFPS()
 

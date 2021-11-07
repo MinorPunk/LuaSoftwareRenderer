@@ -3,40 +3,62 @@ require("Renderer")
 require("Shader")
 require("Camera")
 require("Renderable")
+require("Material")
 
 FPS = 0
-Resolution = {x = 200, y = 200}
-WindowSize = {x = 1600, y = 900}
-local myRenderer = Renderer(-Resolution.x / 2, Resolution.y / 2, Resolution.x, Resolution.y)
+Resolution = {x = 640, y = 480}
+WindowSize = {x = 640, y = 480}
+local myRenderer = Renderer(0, 0, Resolution.x, Resolution.y)
 local myCamera = Camera(WindowSize.x / WindowSize.y)
 local myShader = Shader(myCamera)
-local item = Renderable(myShader)
+local myMaterial = Material(myShader)
+local cat = Renderable(myMaterial)
+
+local rotate = 0
 
 function love.load()
-  item.vbo = {Vertex(), Vertex(), Vertex()}
-  item.vbo[1].position = Vector4(0.5, 0.5)
-  item.vbo[2].position = Vector4(2, 1)
-  item.vbo[3].position = Vector4(3.5, 0.1)
-  item.ebo = {1, 2, 3}
+  cat:LoadObj("chair_01.obj")
+  cat:SetPosition(0, -0.5, 0)
+  cat:SetScale(6, 6, 6)
 
   love.window.setMode(WindowSize.x, WindowSize.y, {resizable = true})
   imageData = love.image.newImageData(Resolution.x, Resolution.y)
   image = love.graphics.newImage(imageData)
   image:setFilter("nearest")
 
-  myRenderer:Render(1, imageData, item, Vector4(0.4, 0.7, 1, 1))
+  myRenderer:Render(1, imageData, cat, Vector4(0.4, 0.7, 1, 1))
 end
 
+local points = {}
 function love.update(dt)
   FPS = love.timer.getFPS()
-  imageData = love.image.newImageData(Resolution.x, Resolution.y)
-  myRenderer:Render(dt, imageData, item, Vector4(0.4, 0.7, 1, 1))
+
+  rotate = rotate + dt / 3
+  cat:SetRotation(0, rotate, 0)
+  --imageData = love.image.newImageData(Resolution.x, Resolution.y)
+
+  imageData:mapPixel(
+    function()
+      return 0, 0, 0, 0
+    end
+  )
+
+  myRenderer:Render(dt, imageData, cat, Vector4(0.4, 0.7, 1, 1))
+
+  --[[
+  for x = 0, Resolution.x - 1 do
+    for y = 0, Resolution.y - 1 do
+      imageData:setPixel(x, y, x / 255, y / 255, (x + y) / 255, 1)
+    end
+  end
+  ]]
 end
 
 function love.draw()
   image:replacePixels(imageData)
   love.graphics.draw(image, 0, 0, 0, WindowSize.x / Resolution.x, WindowSize.y / Resolution.y)
   --love.graphics.draw(image, 0, 0)
+  --love.graphics.points(points)
   love.graphics.print("FPS: " .. FPS, WindowSize.x / 2, 0)
   love.graphics.print("Resolution: " .. Resolution.x .. "," .. Resolution.y, WindowSize.x * 0.8, 0)
 end

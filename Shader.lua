@@ -1,22 +1,21 @@
 local Matrix = require("Math/Math")
 
 Shader = {
-    modelMatrix = {},
+    modelMatrix = Matrix:new(4, "I"),
     camera = {}
 }
 
 setmetatable(Shader, Shader)
 
 Shader.__index = Shader
-Shader.__call = function(t, camera, renderable)
+Shader.__call = function(t, camera)
     return Shader.new(camera)
 end
 
-Shader.new = function(camera, renderable)
+Shader.new = function(camera)
     local inst = {}
     setmetatable(inst, Shader)
     inst.camera = camera
-    inst.renderable = renderable
     return inst
 end
 

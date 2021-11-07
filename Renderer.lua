@@ -20,7 +20,7 @@ Renderer.new = function(ox, oy, sw, sh)
         {0, 0, 1, 0},
         {0, 0, 0, 1}
     }
-    print(inst.viewportMatrix)
+    --print(inst.viewportMatrix)
     return inst
 end
 
@@ -32,8 +32,9 @@ Renderer.Render = function(self, dt, imageData, renderable, color)
         for j = i, i + 2 do
             local v2f = {}
             index = renderable.ebo[j]
+            --print(j .. " index: " .. index, renderable.vbo[index].position)
             --vertex shader
-            v2f = renderable.shader:VertexShader(renderable.vbo[index])
+            v2f = renderable.material.shader:VertexShader(renderable.vbo[index])
             --print("shader", v2f.clipPos)
             --NDC
             v2f:NDC()

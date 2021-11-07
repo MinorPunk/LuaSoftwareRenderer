@@ -1,6 +1,6 @@
 Vertex = {
-    position = Vector4.zero(),
-    texcoord = Vector4.zero(),
+    position = Vector4(),
+    texcoord = Vector4(),
     normal = Vector4(0, 0, 1, 0)
 }
 

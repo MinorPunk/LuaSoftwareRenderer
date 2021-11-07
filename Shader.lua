@@ -19,13 +19,13 @@ Shader.new = function(camera)
     return inst
 end
 
+--[[
+    objectPos -> ModelMatrix -> worldSpace
+    worldPos -> ViewMatrix -> cameraSpace
+    cameraPos -> ProjectionMatrix -> clipSpace
+]]
 Shader.VertexShader = function(self, vertex)
     v2f = V2F()
-    --[[
-        objectPos -> ModelMatrix -> worldSpace
-        worldPos -> ViewMatrix -> cameraSpace
-        cameraPos -> ProjectionMatrix -> clipSpace
-    ]]
     clipPosMatrix =
         self.camera.projectionMatrix * self.camera.viewMatrix * self.modelMatrix * Math.V4ToMatrix(vertex.position)
     v2f.clipPos = Math.MatrixToV4(clipPosMatrix)

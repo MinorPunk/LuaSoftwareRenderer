@@ -1,9 +1,9 @@
 V2F = {
-    worldPos = Vector4.zero(),
-    clipPos = Vector4.zero(),
-    color = Vector4.zero(),
-    texcoord = Vector4.zero(),
-    normal = Vector4.zero()
+    worldPos = Vector4(),
+    clipPos = Vector4(),
+    color = Vector4(),
+    texcoord = Vector4(),
+    normal = Vector4()
 }
 
 setmetatable(V2F, V2F)

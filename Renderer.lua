@@ -26,38 +26,28 @@ end
 
 --渲染流程
 Renderer.Render = function(self, dt, imageData, renderable, color)
-    --取三角形
     lastTime = love.timer.getTime()
     for i = 1, #renderable.ebo, 3 do
+        --read triangle 取三角形
         local v2fs = {}
         for j = i, i + 2 do
             local v2f = {}
             index = renderable.ebo[j]
-            --print(j .. " index: " .. index, renderable.vbo[index].position)
             --vertex shader
             v2f = renderable.material.shader:VertexShader(renderable.vbo[index])
-            --print("shader", v2f.clipPos)
             --NDC
             v2f:NDC()
-            --print("NDC", v2f.clipPos)
             --视口变换
             viewportTransform(self.viewportMatrix, v2f)
-            --print("viewport", v2f.clipPos)
             table.insert(v2fs, v2f)
         end
-        --画三角形
-        DrawTriangle(self, v2fs, imageData, color)
+
+        --draw triangle 画三角形
+        DrawTriangle(v2fs, imageData, color)
     end
-    print("Render Loop: ", love.timer.getTime() - lastTime)
 end
 
-function Rasterization(self, v2fs, imageData, color)
-end
-
---[[
-    光栅化
-]]
-function DrawTriangle(self, v2fs, imageData, color)
+function DrawTriangle(v2fs, imageData, color)
     width = imageData:getWidth() - 1
     height = imageData:getHeight() - 1
     bboxMin = Vector4(width, height)

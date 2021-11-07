@@ -81,7 +81,3 @@ Vector4.__eq = function(self, other)
     local length = temp:SqrMagnitude()
     return length < 1e-10
 end
-
-Vector4.zero = function()
-    return Vector4(0, 0, 0, 0)
-end

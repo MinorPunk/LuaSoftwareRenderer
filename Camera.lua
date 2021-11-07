@@ -75,14 +75,3 @@ function GetProjectionMatrix(fov, aspect, near, far)
         {0, 0, -1, 0}
     }
 end
-
---[[
-Camera.GetProjectionMatrix = function(self, aspect)
-    return Matrix {
-        {1 / (aspect * math.tan(self.fov / 2)), 0, 0, 0},
-        {0, 1 / math.tan(self.fov / 2), 0, 0},
-        {0, 0, -(self.far + self.near) / (self.far - self.near), -2 * self.far * self.near / (self.far - self.near)},
-        {0, 0, -1, 0}
-    }
-end
-]]

@@ -20,7 +20,7 @@ function love.load()
   --加载.obj文件
   cat:LoadObj("chair_01.obj")
   cat:SetPosition(0, -0.5, 0)
-  cat:SetScale(6, 6, 6)
+  cat:SetScale(10, 10, 10)
 
   --Init windows and image,etc
   --初始化窗口等
@@ -33,7 +33,7 @@ end
 function love.update(dt)
   --Rotate model
   --旋转模型
-  rotate = rotate + dt / 3
+  rotate = rotate + dt / 6
   cat:SetRotation(0, rotate, 0)
 
   --Clear imageData every frame

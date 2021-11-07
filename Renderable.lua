@@ -40,9 +40,9 @@ end
 Renderable.SetScale = function(self, ax, ay, az)
     self.scaleMatrix =
         Matrix {
-        {ax, 0, 0, 0},
-        {0, ay, 0, 0},
-        {0, 0, az, 0},
+        {ax or 1, 0, 0, 0},
+        {0, ay or 1, 0, 0},
+        {0, 0, az or 1, 0},
         {0, 0, 0, 1}
     }
     UpdateModelMatrix(self)
@@ -51,9 +51,9 @@ end
 Renderable.SetPosition = function(self, ax, ay, az)
     self.translateMatrix =
         Matrix {
-        {1, 0, 0, ax},
-        {0, 1, 0, ay},
-        {0, 0, 1, az},
+        {1, 0, 0, ax or 0},
+        {0, 1, 0, ay or 0},
+        {0, 0, 1, az or 0},
         {0, 0, 0, 1}
     }
     UpdateModelMatrix(self)

@@ -66,6 +66,11 @@ function DrawTriangle(v2fs, imageData, color)
     a20 = v2fs[3].clipPos.y - v2fs[1].clipPos.y
     b20 = v2fs[1].clipPos.x - v2fs[3].clipPos.x
 
+    bboxMin.x = math.floor(bboxMin.x)
+    bboxMin.y = math.floor(bboxMin.y)
+    bboxMax.x = math.floor(bboxMax.x)
+    bboxMax.y = math.floor(bboxMax.y)
+
     p = Vector4(bboxMin.x, bboxMin.y)
     w0_row = Orient2d(v2fs[2], v2fs[3], p)
     w1_row = Orient2d(v2fs[3], v2fs[1], p)
@@ -73,9 +78,9 @@ function DrawTriangle(v2fs, imageData, color)
 
     --Rasterize
     for y = bboxMin.y, bboxMax.y do
-        w0 = w0_row
-        w1 = w1_row
-        w2 = w2_row
+        w0 = w0_row + 60
+        w1 = w1_row + 60
+        w2 = w2_row + 60
 
         for x = bboxMin.x, bboxMax.x do
             if w0 >= 0 and w1 >= 0 and w2 >= 0 then

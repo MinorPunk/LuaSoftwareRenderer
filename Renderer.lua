@@ -34,6 +34,7 @@ Renderer.Render = function(self, dt, imageData, renderable, color)
     for i = 1, #renderable.ebo, 3 do
         --read triangle 取三角形
         local v2fs = {}
+        faceNormal = {}
         for j = i, i + 2 do
             local v2f = {}
             index = renderable.ebo[j]
@@ -41,25 +42,55 @@ Renderer.Render = function(self, dt, imageData, renderable, color)
             v2f = renderable.material.shader:VertexShader(renderable.vbo[index])
             --NDC
             v2f:NDC()
-            --视口变换
-            viewportTransform(self.viewportMatrix, v2f)
             table.insert(v2fs, v2f)
         end
 
-        --draw triangle 画三角形
-        Rasterization(self, v2fs, imageData, color)
+        --culling
+        culling, faceNormal = FaceCulling(v2fs)
+
+        if not culling then
+            for j = 1, 3 do
+                --视口变换
+                viewportTransform(self.viewportMatrix, v2fs[j])
+            end
+
+            --draw triangle 画三角形
+            Rasterization(self, v2fs, imageData, faceNormal, color)
+        end
     end
 end
 
-function Rasterization(self, v2fs, imageData, color)
+--NDC之后剔除面，此时观察方向为(0,0,1)
+function FaceCulling(v2fs)
+    normal = Vector4.Cross(v2fs[2].worldPos - v2fs[1].worldPos, v2fs[3].worldPos - v2fs[1].worldPos)
+    normal = normal:Normal()
+
+    outOfScreen = {false, false, false}
+    for i = 1, 3 do
+        if v2fs[i].clipPos.x < -1 or v2fs[i].clipPos.x > 1 or v2fs[i].clipPos.y < -1 or v2fs[i].clipPos.y > 1 then
+            outOfScreen[i] = true
+        end
+    end
+    if outOfScreen[1] and outOfScreen[2] and outOfScreen[3] then
+        return true, nil
+    end
+
+    --暂时留0.2，不然可以观察到垂直面明显的剔除过程
+    if Vector4.Dot(normal, Vector4(0, 0, 1)) > 0.2 then
+        return true, nil
+    end
+
+    return false, normal
+end
+
+function Rasterization(self, v2fs, imageData, faceNormal, color)
     width = imageData:getWidth() - 1
     height = imageData:getHeight() - 1
     bboxMin = Vector4(width, height)
     bboxMax = Vector4()
 
-    normal = Vector4.Cross(v2fs[3].worldPos - v2fs[2].worldPos, v2fs[1].worldPos - v2fs[2].worldPos)
-    normal = normal:Normal()
-    intensity = math.min(1, math.max(0.1, -Vector4.Dot(normal, self.lightDir)))
+    --计算光照
+    intensity = math.min(1, math.max(0.12, -Vector4.Dot(faceNormal, self.lightDir)))
 
     for i = 1, 3 do
         bboxMin.x = math.max(0, math.min(bboxMin.x, v2fs[i].clipPos.x))

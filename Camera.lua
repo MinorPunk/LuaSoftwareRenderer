@@ -3,7 +3,7 @@ local Matrix = require("Math/Math")
 --[TODO：在透视相机和正交相机间交换]
 Camera = {
     fov = 60,
-    near = 0.0001,
+    near = 0.01,
     far = 1000,
     position = Vector4(0, 0, -10, 1),
     up = Vector4(0, 1, 0),

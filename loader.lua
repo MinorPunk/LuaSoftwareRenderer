@@ -41,11 +41,7 @@ function loader.parse(object)
             local v = Vector4(tonumber(l[2]), tonumber(l[3]), tonumber(l[4]), tonumber(l[5]) or 1.0)
             table.insert(obj.v, v)
         elseif l[1] == "vt" then
-            local vt = {
-                u = tonumber(l[2]),
-                v = tonumber(l[3]),
-                w = tonumber(l[4]) or 0
-            }
+            local vt = Vector4(tonumber(l[2]), tonumber(l[3]), tonumber(l[4]) or 0)
             table.insert(obj.vt, vt)
         elseif l[1] == "vn" then
             local vn = Vector4(tonumber(l[2]), tonumber(l[3]), tonumber(l[4]))
@@ -58,12 +54,18 @@ function loader.parse(object)
             }
             table.insert(obj.vp, vp)
         elseif l[1] == "f" then
-            for i = 2, 4 do
+            if #l == 5 and l[5] ~= "" then
+                temp = l[5]
+                l[5] = l[4]
+                l[6] = temp
+                l[7] = l[2]
+            end
+            for i = 2, #l do
                 local split = string_split(l[i], "/")
                 local v = {}
 
                 v.v = tonumber(split[1])
-                if split[2] ~= "" then
+                if #split >= 2 then
                     v.vt = tonumber(split[2])
                 end
                 if #split >= 3 then
@@ -73,7 +75,7 @@ function loader.parse(object)
                 if vbo[v.v] == nil then
                     local vertex = Vertex()
                     vertex.position = obj.v[v.v]
-                    vertex.normal = obj.vn[v.vn]
+                    --vertex.normal = obj.vn[v.vn]
                     vertex.texcoord = obj.vt[v.vt]
                     vbo[v.v] = vertex
                 end

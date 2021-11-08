@@ -1,5 +1,4 @@
 Material = {
-    color = {},
     texture = {},
     shader = {}
 }
@@ -15,4 +14,9 @@ Material.new = function(shader)
     setmetatable(inst, Material)
     inst.shader = shader
     return inst
+end
+
+Material.loadTexture = function(self, path)
+    self.texture = love.image.newImageData(path)
+    self.shader.texture = self.texture
 end

@@ -2,6 +2,7 @@ local Matrix = require("Math/Math")
 
 Shader = {
     modelMatrix = Matrix:new(4, "I"),
+    texture = {},
     camera = {}
 }
 
@@ -31,10 +32,10 @@ Shader.VertexShader = function(self, vertex)
     clipPosMatrix = self.camera.projectionMatrix * self.camera.viewMatrix * worldMatrix
     v2f.clipPos = Math.MatrixToV4(clipPosMatrix)
     v2f.texcoord = vertex.texcoord
-    v2f.normal = vertex.normal
     return v2f
 end
 
 Shader.FragmentShader = function(self, v2f)
-    return v2f.color
+    width, height = self.texture:getWidth() - 1, self.texture:getHeight() - 1
+    return self.texture:getPixel(width * v2f.texcoord.x, height * v2f.texcoord.y)
 end

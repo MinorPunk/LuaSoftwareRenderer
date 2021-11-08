@@ -1,7 +1,8 @@
 Vertex = {
     position = Vector4(),
-    texcoord = Vector4(),
-    normal = Vector4(0, 0, 1, 0)
+    texcoord = Vector4()
+    --不使用顶点normal数据
+    --normal = Vector4(0, 0, 1, 0)
 }
 
 setmetatable(Vertex, Vertex)

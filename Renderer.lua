@@ -55,7 +55,7 @@ Renderer.Render = function(self, dt, imageData, renderable, color)
             end
 
             --draw triangle 画三角形
-            Rasterization(self, v2fs, imageData, faceNormal, color)
+            Rasterization(self, v2fs, imageData, faceNormal, renderable)
         end
     end
 end
@@ -65,6 +65,7 @@ function FaceCulling(v2fs)
     normal = Vector4.Cross(v2fs[2].worldPos - v2fs[1].worldPos, v2fs[3].worldPos - v2fs[1].worldPos)
     normal = normal:Normal()
 
+    --屏幕剔除
     outOfScreen = {false, false, false}
     for i = 1, 3 do
         if v2fs[i].clipPos.x < -1 or v2fs[i].clipPos.x > 1 or v2fs[i].clipPos.y < -1 or v2fs[i].clipPos.y > 1 then
@@ -83,11 +84,13 @@ function FaceCulling(v2fs)
     return false, normal
 end
 
-function Rasterization(self, v2fs, imageData, faceNormal, color)
+function Rasterization(self, v2fs, imageData, faceNormal, renderable)
     width = imageData:getWidth() - 1
     height = imageData:getHeight() - 1
     bboxMin = Vector4(width, height)
     bboxMax = Vector4()
+    texcoordMinX, texcoordMinY, texcoordMaxX, texcoordMaxY = 0, 0, 0, 0
+    texcoordStepX, texcoordStepY = 0, 0
 
     --计算光照
     intensity = math.min(1, math.max(0.12, -Vector4.Dot(faceNormal, self.lightDir)))
@@ -97,6 +100,11 @@ function Rasterization(self, v2fs, imageData, faceNormal, color)
         bboxMin.y = math.max(0, math.min(bboxMin.y, v2fs[i].clipPos.y))
         bboxMax.x = math.min(width, math.max(bboxMax.x, v2fs[i].clipPos.x))
         bboxMax.y = math.min(height, math.max(bboxMax.y, v2fs[i].clipPos.y))
+
+        texcoordMinX = math.min(texcoordMinX, v2fs[i].texcoord.x)
+        texcoordMinY = math.min(texcoordMinY, v2fs[i].texcoord.y)
+        texcoordMaxX = math.max(texcoordMaxX, v2fs[i].texcoord.x)
+        texcoordMaxY = math.max(texcoordMaxY, v2fs[i].texcoord.y)
     end
 
     a01 = v2fs[1].clipPos.y - v2fs[2].clipPos.y
@@ -111,6 +119,9 @@ function Rasterization(self, v2fs, imageData, faceNormal, color)
     bboxMax.x = math.floor(bboxMax.x)
     bboxMax.y = math.floor(bboxMax.y)
 
+    texcoordStepX = (texcoordMaxX - texcoordMinX) / (bboxMax.x - bboxMin.x)
+    texcoordStepY = (texcoordMaxY - texcoordMinY) / (bboxMax.y - bboxMin.y)
+
     p = Vector4(bboxMin.x, bboxMin.y)
     w0_row = Orient2d(v2fs[2], v2fs[3], p)
     w1_row = Orient2d(v2fs[3], v2fs[1], p)
@@ -118,6 +129,7 @@ function Rasterization(self, v2fs, imageData, faceNormal, color)
     --print("w0_row:" .. w0_row .. "w1_row:" .. w1_row .. "w2_row:" .. w2_row)
 
     --Rasterize
+    tempV2f = V2F()
     for y = bboxMin.y, bboxMax.y do
         w0 = w0_row
         w1 = w1_row
@@ -130,10 +142,17 @@ function Rasterization(self, v2fs, imageData, faceNormal, color)
                 w0n = w0 / wSum
                 w1n = w1 / wSum
                 w2n = w2 / wSum
+
                 zc = w0n * v2fs[1].clipPos.z + w1n * v2fs[2].clipPos.z + w2n * v2fs[3].clipPos.z
                 if zb == nil or zb > zc then
                     self.zBuffer[x + (y - 1) * width] = zc
-                    imageData:setPixel(x, y, color.x * intensity, color.y * intensity, color.z * intensity, color.w)
+                    tempV2f.texcoord = v2fs[1].texcoord * w0n + v2fs[2].texcoord * w1n + v2fs[3].texcoord * w2n
+                    --tempV2f.texcoord.x = texcoordMinX + (x - bboxMin.x) * texcoordStepX
+                    --tempV2f.texcoord.y = texcoordMinY + (y - bboxMin.y) * texcoordStepY
+                    --print("texcoord:", tempV2f.texcoord)
+                    r, g, b, a = renderable.material.shader:FragmentShader(tempV2f)
+                    -- r, g, b, a = 1, 1, 1, 1
+                    imageData:setPixel(x, y, intensity * r, intensity * g, intensity * b, a)
                 end
             end
 

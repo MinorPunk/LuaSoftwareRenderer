@@ -18,9 +18,11 @@ local rotate = 0
 function love.load()
   --Load model from .obj file, set its position and scale
   --加载.obj文件
-  myModel:LoadObj("chair_01.obj")
-  myModel:SetPosition(0, -5, 0)
-  myModel:SetScale(10, 10, 10)
+  myModel:LoadObj("Model/ammo_box.obj")
+  myModel:SetPosition(0, -4, 0)
+  --myModel:SetScale(0.4, 0.4, 0.4)
+
+  myMaterial:loadTexture("Model/ammo_box_D.png")
 
   --Init windows and image,etc
   --初始化窗口等

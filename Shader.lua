@@ -26,8 +26,9 @@ end
 ]]
 Shader.VertexShader = function(self, vertex)
     v2f = V2F()
-    clipPosMatrix =
-        self.camera.projectionMatrix * self.camera.viewMatrix * self.modelMatrix * Math.V4ToMatrix(vertex.position)
+    worldMatrix = self.modelMatrix * Math.V4ToMatrix(vertex.position)
+    v2f.worldPos = Math.MatrixToV4(worldMatrix)
+    clipPosMatrix = self.camera.projectionMatrix * self.camera.viewMatrix * worldMatrix
     v2f.clipPos = Math.MatrixToV4(clipPosMatrix)
     v2f.texcoord = vertex.texcoord
     v2f.normal = vertex.normal

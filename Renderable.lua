@@ -33,7 +33,7 @@ end
 
 function UpdateModelMatrix(self)
     self.modelMatrix =
-        self.axRotateMatrix * self.ayRotateMatrix * self.azRotateMatrix * self.scaleMatrix * self.translateMatrix
+        self.axRotateMatrix * self.ayRotateMatrix * self.azRotateMatrix * self.translateMatrix * self.scaleMatrix
     self.material.shader.modelMatrix = self.modelMatrix
 end
 

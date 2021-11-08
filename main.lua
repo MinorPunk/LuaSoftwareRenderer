@@ -5,8 +5,8 @@ require("Camera")
 require("Renderable")
 require("Material")
 
-Resolution = {x = 1600, y = 900}
-WindowSize = {x = 1600, y = 900}
+Resolution = {x = 800, y = 450}
+WindowSize = {x = 800, y = 450}
 local myRenderer = Renderer(0, 0, Resolution.x, Resolution.y)
 local myCamera = Camera(WindowSize.x / WindowSize.y)
 local myShader = Shader(myCamera)
@@ -19,7 +19,7 @@ function love.load()
   --Load model from .obj file, set its position and scale
   --加载.obj文件
   cat:LoadObj("chair_01.obj")
-  cat:SetPosition(0, -0.5, 0)
+  cat:SetPosition(0, -5, 0)
   cat:SetScale(10, 10, 10)
 
   --Init windows and image,etc
@@ -44,7 +44,7 @@ function love.update(dt)
     end
   )
 
-  myRenderer:Render(dt, imageData, cat, Vector4(0.4, 0.7, 1, 1))
+  myRenderer:Render(dt, imageData, cat, Vector4(1, 1, 1, 1))
 end
 
 function love.draw()

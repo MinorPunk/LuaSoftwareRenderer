@@ -1,7 +1,9 @@
 local Matrix = require("Math/Math")
 
 Renderer = {
-    viewportMatrix = {}
+    viewportMatrix = {},
+    lightDir = Vector4(-1, -1, 1),
+    zBuffer = {}
 }
 
 setmetatable(Renderer, Renderer)
@@ -20,12 +22,14 @@ Renderer.new = function(ox, oy, sw, sh)
         {0, 0, 1, 0},
         {0, 0, 0, 1}
     }
+    inst.lightDir = inst.lightDir:Normal()
     --print(inst.viewportMatrix)
     return inst
 end
 
 --渲染流程
 Renderer.Render = function(self, dt, imageData, renderable, color)
+    self.zBuffer = {}
     lastTime = love.timer.getTime()
     for i = 1, #renderable.ebo, 3 do
         --read triangle 取三角形
@@ -43,15 +47,20 @@ Renderer.Render = function(self, dt, imageData, renderable, color)
         end
 
         --draw triangle 画三角形
-        DrawTriangle(v2fs, imageData, color)
+        Rasterization(self, v2fs, imageData, color)
     end
 end
 
-function DrawTriangle(v2fs, imageData, color)
+function Rasterization(self, v2fs, imageData, color)
     width = imageData:getWidth() - 1
     height = imageData:getHeight() - 1
     bboxMin = Vector4(width, height)
     bboxMax = Vector4()
+
+    normal = Vector4.Cross(v2fs[3].worldPos - v2fs[2].worldPos, v2fs[1].worldPos - v2fs[2].worldPos)
+    normal = normal:Normal()
+    intensity = math.min(1, math.max(0.1, -Vector4.Dot(normal, self.lightDir)))
+
     for i = 1, 3 do
         bboxMin.x = math.max(0, math.min(bboxMin.x, v2fs[i].clipPos.x))
         bboxMin.y = math.max(0, math.min(bboxMin.y, v2fs[i].clipPos.y))
@@ -75,16 +84,26 @@ function DrawTriangle(v2fs, imageData, color)
     w0_row = Orient2d(v2fs[2], v2fs[3], p)
     w1_row = Orient2d(v2fs[3], v2fs[1], p)
     w2_row = Orient2d(v2fs[1], v2fs[2], p)
+    --print("w0_row:" .. w0_row .. "w1_row:" .. w1_row .. "w2_row:" .. w2_row)
 
     --Rasterize
     for y = bboxMin.y, bboxMax.y do
-        w0 = w0_row + 60
-        w1 = w1_row + 60
-        w2 = w2_row + 60
+        w0 = w0_row
+        w1 = w1_row
+        w2 = w2_row
 
         for x = bboxMin.x, bboxMax.x do
             if w0 >= 0 and w1 >= 0 and w2 >= 0 then
-                imageData:setPixel(x, y, color.x, color.y, color.z, color.w)
+                zb = self.zBuffer[x + (y - 1) * width]
+                wSum = w0 + w1 + w2
+                w0n = w0 / wSum
+                w1n = w1 / wSum
+                w2n = w2 / wSum
+                zc = w0n * v2fs[1].clipPos.z + w1n * v2fs[2].clipPos.z + w2n * v2fs[3].clipPos.z
+                if zb == nil or zb > zc then
+                    self.zBuffer[x + (y - 1) * width] = zc
+                    imageData:setPixel(x, y, color.x * intensity, color.y * intensity, color.z * intensity, color.w)
+                end
             end
 
             w0 = w0 + a12

@@ -33,7 +33,17 @@ function Vector4.Lerp(from, to, factor)
 end
 
 function Vector4.SqrMagnitude(self)
-    return Vector4(self.x * self.x, self.y * self.y, self.z * self.z, self.w * self.w)
+    return self.x * self.x + self.y * self.y + self.z * self.z + self.w * self.w
+end
+
+--for Vector3
+function Vector4.Magnitude(self)
+    return math.sqrt(self:SqrMagnitude())
+end
+
+function Vector4.Normal(self)
+    magnitude = self:Magnitude()
+    return self / magnitude
 end
 
 --[[

@@ -30,7 +30,7 @@ $love LuaSoftwareRenderer
 ## TODO-List
 
 - [ ] Normal Map
-- [ ] Diffuse lighting
+- [ ] Point Light
 - [ ] Outline shader
 - [ ] Casting shadow
 

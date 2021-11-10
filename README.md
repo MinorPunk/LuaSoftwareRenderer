@@ -3,7 +3,7 @@ Make a software renderer using Lua cz I'm boring
 
 ---
 
-Make sure [love](https://love2d.org/wiki/Main_Page) is installed on your computer.
+This renderer uses love2d as graphic api(only for creating windows and drawing the final framebuffer). Make sure [love](https://love2d.org/wiki/Main_Page) is installed on your computer.
 
 for Linux:
 

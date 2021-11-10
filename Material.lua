@@ -1,5 +1,5 @@
 Material = {
-    texture = {},
+    texture = false,
     shader = {}
 }
 

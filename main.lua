@@ -5,22 +5,22 @@ require("Camera")
 require("Renderable")
 require("Material")
 
-Resolution = {x = 1200, y = 675}
-WindowSize = {x = 1200, y = 675}
-local myRenderer = Renderer(0, 0, Resolution.x, Resolution.y)
-local myCamera = Camera(WindowSize.x / WindowSize.y)
-local myShader = Shader(myCamera)
-local myMaterial = Material(myShader)
-local myModel = Renderable(myMaterial)
+Resolution = {x = 400, y = 225}
+WindowSize = {x = 1600, y = 900}
+local myRenderer = Renderer.new(0, 0, Resolution.x, Resolution.y)
+local myCamera = Camera.new(WindowSize.x / WindowSize.y)
+local myShader = Shader.new(myCamera)
+local myMaterial = Material.new(myShader)
+local myModel = Renderable.new(myMaterial)
 
 local rotate = 0
 
 function love.load()
   --Load model from .obj file, set its position and scale
   --加载.obj文件
-  myModel:LoadObj("Model/ammo_box.obj")
-  myModel:SetPosition(0, -4, 0)
-  --myModel:SetScale(0.4, 0.4, 0.4)
+  myModel:LoadObj("Model/ammo_box2.obj")
+  myModel:SetPosition(0, 0, 0)
+  myModel:SetScale(2, 2, 2)
 
   myMaterial:loadTexture("Model/ammo_box_D.png")
 
@@ -35,8 +35,8 @@ end
 function love.update(dt)
   --Rotate model
   --旋转模型
-  rotate = rotate + dt / 6
-  myModel:SetRotation(0, rotate, 0)
+  rotate = rotate + dt / 4
+  myModel:SetRotation(rotate, rotate, rotate)
 
   --Clear imageData every frame
   --每帧清空buffer
@@ -46,12 +46,12 @@ function love.update(dt)
     end
   )
 
-  myRenderer:Render(dt, imageData, myModel, Vector4(1, 1, 1, 1))
+  myRenderer:Render(dt, imageData, myModel)
 end
 
 function love.draw()
   image:replacePixels(imageData)
   love.graphics.draw(image, 0, 0, 0, WindowSize.x / Resolution.x, WindowSize.y / Resolution.y)
-  love.graphics.print("FPS: " .. love.timer.getFPS(), WindowSize.x / 2, 0)
+  --love.graphics.print("FPS: " .. love.timer.getFPS(), WindowSize.x / 2, 0)
   love.graphics.print("Resolution: " .. Resolution.x .. "," .. Resolution.y, WindowSize.x * 0.8, 0)
 end

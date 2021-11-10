@@ -21,13 +21,6 @@ Vector4.new = function(x, y, z, w)
     return v4
 end
 
-function Vector4:Set(x, y, z, w)
-    self.x = x or 0
-    self.y = y or 0
-    self.z = z or 0
-    self.w = w or 0
-end
-
 function Vector4.Lerp(from, to, factor)
     return (1 - factor) * from + factor * to
 end
@@ -53,7 +46,14 @@ function Vector4.Cross(v1, v2)
     local x = v1.y * v2.z - v1.z * v2.y
     local y = v1.z * v2.x - v1.x * v2.z
     local z = v1.x * v2.y - v1.y * v2.x
-    return Vector4(x, y, z, 0)
+    return Vector4.new(x, y, z, 0)
+end
+
+function Vector4.RawCross(v1, v2)
+    local x = v1.y * v2.z - v1.z * v2.y
+    local y = v1.z * v2.x - v1.x * v2.z
+    local z = v1.x * v2.y - v1.y * v2.x
+    return x, y, z
 end
 
 function Vector4.Dot(v1, v2)
@@ -75,7 +75,7 @@ Vector4.__div = function(self, d)
 end
 
 Vector4.__add = function(self, other)
-    return Vector4(self.x + other.x, self.y + other.y, self.z + other.z, self.w + other.w)
+    return Vector4.new(self.x + other.x, self.y + other.y, self.z + other.z, self.w + other.w)
 end
 
 Vector4.__sub = function(self, other)
@@ -83,7 +83,7 @@ Vector4.__sub = function(self, other)
 end
 
 Vector4.__unm = function(self)
-    return Vector4(-self.x, -self.y, -self.z, -self.w)
+    return Vector4.new(-self.x, -self.y, -self.z, -self.w)
 end
 
 Vector4.__eq = function(self, other)

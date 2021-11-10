@@ -25,13 +25,13 @@ end
     worldPos -> ViewMatrix -> cameraSpace
     cameraPos -> ProjectionMatrix -> clipSpace
 ]]
-Shader.VertexShader = function(self, vertex)
-    v2f = V2F()
-    worldMatrix = self.modelMatrix * Math.V4ToMatrix(vertex.position)
+Shader.VertexShader = function(self, vertexPos, texcoord)
+    v2f = V2F.new()
+    worldMatrix = self.modelMatrix * Math.V4ToMatrix(vertexPos)
     v2f.worldPos = Math.MatrixToV4(worldMatrix)
     clipPosMatrix = self.camera.projectionMatrix * self.camera.viewMatrix * worldMatrix
     v2f.clipPos = Math.MatrixToV4(clipPosMatrix)
-    v2f.texcoord = vertex.texcoord
+    v2f.texcoord = texcoord
     return v2f
 end
 

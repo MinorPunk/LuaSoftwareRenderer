@@ -9,8 +9,7 @@ Renderable = {
     scaleMatrix = Matrix:new(4, "I"),
     translateMatrix = Matrix:new(4, "I"),
     material = {},
-    vbo = {},
-    ebo = {}
+    obj = {}
 }
 
 setmetatable(Renderable, Renderable)
@@ -28,7 +27,7 @@ Renderable.new = function(material)
 end
 
 Renderable.LoadObj = function(self, path)
-    self.vbo, self.ebo = loader.load(path)
+    self.obj = loader.load(path)
 end
 
 function UpdateModelMatrix(self)

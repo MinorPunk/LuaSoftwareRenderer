@@ -1,28 +1,22 @@
 require "Math/Math"
 
-function string_split(s, d)
-    local t = {}
-    local i = 0
-    local f
-    local match = "(.-)" .. d .. "()"
+vec = Vector4.new(1, 2, 3, 4)
 
-    if string.find(s, d) == nil then
-        return {s}
-    end
-
-    for sub, j in string.gmatch(s, match) do
-        i = i + 1
-        t[i] = sub
-        f = j
-    end
-
-    if i ~= 0 then
-        t[i + 1] = string.sub(s, f)
-    end
-
-    return t
+last = os.clock()
+for i = 1, 100000 do
+    vec = vec / 1.1
 end
 
-test = "f 47/242 103/543 119/631"
-local l = string_split(test, "%s+")
-print(l[1], l[2], l[3], l[4])
+print("vec div:", os.clock - last)
+last = os.clock()
+
+x, y, z, w = 1, 2, 3, 4
+for i = 1, 100000 do
+    x = x / 1.1
+    y = y / 1.1
+    z = z / 1.1
+    w = w / 1.1
+end
+
+print("xyzw div:", os.clock - last)
+last = os.clock()

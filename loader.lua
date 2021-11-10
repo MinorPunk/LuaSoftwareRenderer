@@ -24,8 +24,6 @@ function loader.load(file)
 end
 
 function loader.parse(object)
-    local vbo = {}
-    local ebo = {}
     local obj = {
         v = {}, -- List of vertices - x, y, z, [w]=1.0
         vt = {}, -- Texture coordinates - u, v, [w]=0
@@ -54,37 +52,35 @@ function loader.parse(object)
             }
             table.insert(obj.vp, vp)
         elseif l[1] == "f" then
-            if #l == 5 and l[5] ~= "" then
+            if #l >= 5 and l[5] ~= "" then
                 temp = l[5]
                 l[5] = l[4]
                 l[6] = temp
                 l[7] = l[2]
             end
-            for i = 2, #l do
-                local split = string_split(l[i], "/")
-                local v = {}
+            for i = 2, #l, 3 do
+                local f = {}
 
-                v.v = tonumber(split[1])
-                if #split >= 2 then
-                    v.vt = tonumber(split[2])
-                end
-                if #split >= 3 then
-                    v.vn = tonumber(split[3])
-                end
+                for j = i, i + 2 do
+                    local split = string_split(l[j], "/")
+                    local v = {}
 
-                if vbo[v.v] == nil then
-                    local vertex = Vertex()
-                    vertex.position = obj.v[v.v]
-                    --vertex.normal = obj.vn[v.vn]
-                    vertex.texcoord = obj.vt[v.vt]
-                    vbo[v.v] = vertex
+                    v.v = tonumber(split[1])
+                    if #split >= 2 then
+                        v.vt = tonumber(split[2])
+                    end
+                    if #split >= 3 then
+                        v.vn = tonumber(split[3])
+                    end
+
+                    f[#f + 1] = v
                 end
-                table.insert(ebo, v.v)
+                table.insert(obj.f, f)
             end
         end
     end
 
-    return vbo, ebo
+    return obj
 end
 
 function file_exists(file)

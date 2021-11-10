@@ -1,9 +1,11 @@
 V2F = {
-    worldPos = Vector4(),
-    clipPos = Vector4(),
-    color = Vector4(),
-    texcoord = Vector4(),
-    normal = Vector4()
+    worldPos = Vector4.new(),
+    clipPos = Vector4.new(),
+    NDC = Vector4.new(),
+    screenPos = Vector4.new(),
+    color = Vector4.new(),
+    texcoord = Vector4.new(),
+    normal = Vector4.new()
 }
 
 setmetatable(V2F, V2F)
@@ -18,5 +20,5 @@ V2F.new = function()
 end
 
 function V2F:NDC()
-    self.clipPos = self.clipPos / self.clipPos.w
+    self.NDC = self.clipPos / self.clipPos.w
 end

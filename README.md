@@ -17,3 +17,20 @@ and run
 $love LuaSoftwareRenderer
 ```
 
+## Screenshot
+
+
+
+![](Screenshot/LuaSR_2.png)
+
+![](Screenshot/LuaSR_3.png)
+
+
+
+## TODO-List
+
+- [ ] Normal Map
+- [ ] Diffuse lighting
+- [ ] Outline shader
+- [ ] Casting shadow
+

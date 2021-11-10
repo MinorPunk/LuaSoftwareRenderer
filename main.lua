@@ -5,7 +5,7 @@ require("Camera")
 require("Renderable")
 require("Material")
 
-Resolution = {x = 400, y = 225}
+Resolution = {x = 1600, y = 900}
 WindowSize = {x = 1600, y = 900}
 local myRenderer = Renderer.new(0, 0, Resolution.x, Resolution.y)
 local myCamera = Camera.new(WindowSize.x / WindowSize.y)
